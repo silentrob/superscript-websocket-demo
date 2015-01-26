@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0px; padding: 0; box-sizing: border-box; }
+      body { 
+        font: 13px Helvetica, Arial; 
+        margin:30px;
+      }
+      form { background: #000; padding: 3px; position: absolute; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #chatwindow {
+        position:relative;
+        border:1px solid #000;
+        width:700px;
+        height:400px;
+        background-color: #fff;
+      }
+      #messageArea {
+        max-height:350px;
+        overflow: scroll;
+        position:relative;
+      }
+    </style>
+
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="coloranim.js"></script>
+
+  </head>
+  <body>
+    <div id="chatwindow">
+        <div id="messageArea">
+          <ul id="messages"></ul>
+        </div>
+        <form action="">
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+  
+
+
+    var oldscrollHeight = $("#chatwindow")[0].scrollHeight;
+
+      var socket = io();
+      $('form').submit(function(){
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+
+      socket.on('chat message', function(msgObj){
+        var msg = msgObj.text;
+        var color = msgObj.color;
+
+        $('body').animate({backgroundColor: color})
+        $('#messages').append($('<li>').text(msg));
+
+        var newscrollHeight = $("#messageArea")[0].scrollHeight;
+        if(newscrollHeight > oldscrollHeight){ 
+          $("#messageArea").scrollTop($("#messageArea")[0].scrollHeight);
+        }
+      });
+
+    </script>
+  </body>
+</html>
