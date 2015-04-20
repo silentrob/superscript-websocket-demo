@@ -9,11 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "superscript": "^0.5.1",
+    "superscript": "latest",
     "conceptnet": "silentrob/conceptnet",
     "express": "^4.10.2",
-    "sfacts": "0.0.8",
+    "sfacts": "latest",
     "socket.io": "^1.3.2",
-    "underscore": "^1.7.0"
+    "underscore": "^1.7.0",
+    "mongoose": "3.8.22"
   }
 }
