@@ -3,22 +3,26 @@ var app = express();
 app.use(express.static(__dirname + '/public'));
 var http = require('http').Server(app);
 
+var mongoose = require("mongoose");
+
 var io = require('socket.io')(http);
 var ss = require("superscript");
 var facts = require("sfacts");
 
+mongoose.connect('mongodb://localhost/colorDemo');
+
 var options = {
+  mongoose : mongoose,
   scope: {
     cnet : require("conceptnet")({host:'127.0.0.1', user:'root', pass:''})
   }
-}
+};
+
 var data = ['./data/color.tbl'];
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/views/index.html');
 });
-
-
 
 var botHandle = function(err, bot) {
     
@@ -39,15 +43,12 @@ var botHandle = function(err, bot) {
   http.listen(3000, function(){
     console.log('listening on *:3000');
   });
-}
-
+};
 
 facts.load(data, 'localdata', function(err, facts){
-  options.factSystem = facts; 
+  options.factSystem = facts;
       
-  new ss('./data.json', options, function(err, botInstance){
+  new ss(options, function(err, botInstance){
     botHandle(null, botInstance);
   });
 });
-
-

@@ -14,7 +14,7 @@ exports.colorLookup = function(cb) {
   // TODO: This could be improved adjectives may be empty
   var thing = (things.length == 1) ? things[0] : message.adjectives[0];
 
-  if(thing != "" && message.pnouns.length == 0) {
+  if(thing !== "" && message.pnouns.length === 0) {
 
     // What else is green (AKA Example of green) OR
     // What color is a tree?
@@ -25,18 +25,18 @@ exports.colorLookup = function(cb) {
     facts.get({ object: fthing, predicate:'color'}, function(err, list) {
       if (!_.isEmpty(list)) {
         var thingOfColor = Utils.pickItem(list);
-        var toc = thingOfColor.subject.replace(/_/g, " ");  
+        var toc = thingOfColor.subject.replace(/_/g, " ");
 
         cb(null, Utils.makeSentense(Utils.indefiniteArticlerize(toc) + " is " + fthing));
       } else {
         facts.get({ subject: fthing, predicate:'color'}, function(err, list) {
           if (!_.isEmpty(list)) {
-          	that.message.props['color'] = list[0].object;
+            that.message.props['color'] = list[0].object;
             cb(null, "Let me show you.");
           } else {
 
             that.cnet.resolveFact("color", thing, function(err, res){
-            	that.message.props['color'] = res;
+              that.message.props['color'] = res;
               if (res) {
                 suggest = "Let me show you.";
               } else {
@@ -49,7 +49,7 @@ exports.colorLookup = function(cb) {
       }
     });
 
-  } else if (message.pronouns.length != 0){
+  } else if (message.pronouns.length !== 0){
     // Your or My color?
     // TODO: Lookup a saved or cached value.
     
@@ -63,12 +63,12 @@ exports.colorLookup = function(cb) {
         if (!_.isEmpty(list)) {
           var color = list[0].object;
           var lookup = message.nouns[1];
-          var toSay = ["Your " + lookup + " is " + color + "."]
+          var toSay = ["Your " + lookup + " is " + color + "."];
 
           facts.get({object:color,  predicate: 'color'}, function(err, list) {
             if (!_.isEmpty(list)) {
               var thingOfColor = Utils.pickItem(list);
-              var toc = thingOfColor.subject.replace(/_/g, " ");  
+              var toc = thingOfColor.subject.replace(/_/g, " ");
               toSay.push("Your " + lookup + " is the same color as a " + toc + ".");
             }
             cb(null, Utils.pickItem(toSay));
@@ -82,15 +82,15 @@ exports.colorLookup = function(cb) {
               var color = list[0].object;
               cb(null,"Your " + thing + " " + pred + " is " + color + ".");
             } else {
-              cb(null,"You never told me what color your " + thing + " is.");  
+              cb(null,"You never told me what color your " + thing + " is.");
             }
           });
           
         }
-      });      
+      });
     }
   } else {
-		that.message.props['color'] = "green";
+    that.message.props['color'] = "green";
     cb(null, "It is blue-green in color.");
   }
-}
+};
