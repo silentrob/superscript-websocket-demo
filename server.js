@@ -29,6 +29,7 @@ var botHandle = function(err, bot) {
   io.on('connection', function(socket) {
     console.log("User '" + socket.id + "' has connected.\n");
     socket.emit('chat message', {text:'Welcome to the SuperScript Color Demo!\n'});
+    socket.emit('chat message', {text:'<< What is your favorite color?\n'});
     
     socket.on('chat message', function(msg){
       // Emit the message back first

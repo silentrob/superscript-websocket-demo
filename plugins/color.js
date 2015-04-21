@@ -1,10 +1,65 @@
 var _ = require("underscore");
 var Utils = require("superscript/lib/utils");
+var userPlugin = require("superscript/plugins/user");
+var Color = require("color");
+var toHex = require('colornames');
+
+
+exports.changeTint = function(cb) {
+  var that = this;
+  var newColor;
+
+  userPlugin.get.call(that, "currentColor", function(err, currentColor) {
+    var color = Color(currentColor);
+    
+    if (that.message.adjectives.indexOf("lighter") !== -1) {
+      newColor = color.lighten(0.5);
+    } else if (that.message.adjectives.indexOf("darker") !== -1) {
+      newColor = color.darken(0.5);
+    }
+    
+    that.message.props['color'] = newColor.hexString();
+    userPlugin.save.call(that, "currentColor", newColor.hexString(), function() {
+      cb(null, "");
+    });
+  });
+};
+
+exports.getRanomColor = function(cb) {
+  var r,g,b, that = this;
+  r = Utils.getRandomInt(0,255);
+  g = Utils.getRandomInt(0,255);
+  b = Utils.getRandomInt(0,255);
+
+  var newColor = Color().rgb(r,g,b);
+  that.message.props['color'] = newColor.hexString();
+
+  userPlugin.save.call(that, "currentColor", newColor.hexString(), function() {
+    cb(null, "How about this?");
+  });
+};
+
+exports.colorLookup2 = function(color, cb) {
+  var that = this;
+  var facts = that.facts.db;
+  
+  facts.get({ object: color, predicate:'color'}, function(err, list) {
+    if (!_.isEmpty(list) || toHex.get(color) !== undefined) {
+      var colorHex = toHex(color);
+      that.message.props['color'] = colorHex;
+      userPlugin.save.call(that, "currentColor", colorHex, function(){
+        cb(null, color + " is a great. This shade?");
+      });
+    } else {
+      cb(null, "That isn't a color");
+    }
+  });
+};
 
 exports.colorLookup = function(cb) {
   var that = this;
   var message = this.message;
-  var things = message.entities.filter(function(item) { if (item != "color") return item; });
+  var things = message.entities.filter(function(item) { if (item !== "color") return item; });
   var suggest = "";
   var facts = that.facts.db;
   var userfacts = that.user.memory.db;
@@ -85,7 +140,6 @@ exports.colorLookup = function(cb) {
               cb(null,"You never told me what color your " + thing + " is.");
             }
           });
-          
         }
       });
     }
