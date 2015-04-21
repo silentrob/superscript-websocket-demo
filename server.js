@@ -36,7 +36,7 @@ var botHandle = function(err, bot) {
       socket.emit('chat message', { text: ">> " + msg });
       bot.reply(socket.id, msg.trim(), function(err, resObj){
         var color = resObj.color || "#fff";
-        socket.emit('chat message', { text: "<< " + resObj.string, color:color });
+        socket.emit('chat message', { text: "<< " + resObj.string, color:color, picker: resObj.picker });
       });
     });
   });

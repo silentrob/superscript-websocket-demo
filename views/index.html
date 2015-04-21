@@ -31,6 +31,10 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="coloranim.js"></script>
 
+    <link rel="stylesheet" media="screen" type="text/css" href="/colorpicker/css/colorpicker.css" />
+    <script type="text/javascript" src="/colorpicker/js/colorpicker.js"></script>
+
+
   </head>
   <body>
     <div id="chatwindow">
@@ -42,8 +46,17 @@
         </form>
     </div>
 
+    <div id="picker" style="display:none"></div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
+
+    var options = {
+      onChange: function(hsb, hex, rgb) { $('body').css('backgroundColor', '#' + hex); },
+      flat: true
+    }
+    
+    $('#picker').ColorPicker(options);
 
     var oldscrollHeight = $("#chatwindow")[0].scrollHeight;
 
@@ -57,6 +70,13 @@
       socket.on('chat message', function(msgObj){
         var msg = msgObj.text;
         var color = msgObj.color;
+
+        console.log(msgObj);
+        if (msgObj.picker && msgObj.picker === "show") {
+          $("#picker").show();
+        } else {
+          $("#picker").hide();
+        }
 
         $('body').animate({backgroundColor: color})
         $('#messages').append($('<li>').text(msg));

@@ -3,7 +3,37 @@ var Utils = require("superscript/lib/utils");
 var userPlugin = require("superscript/plugins/user");
 var Color = require("color");
 var toHex = require('colornames');
+var dataset = require("../data/colorData");
+var ColorClassifier = require("./classify");
+var Point = require("./point");
+var classifier = new ColorClassifier();
 
+function getDataFromVariable(points, callback) {
+  var data = [];
+  for (var i = 0; i < points.length; ++i) {
+    data.push(new Point(points[i].x, points[i].y, points[i].z, points[i].label));
+  }
+  callback(data);
+}
+
+getDataFromVariable(dataset, function(datax) {
+  classifier.learn(datax);
+});
+
+
+exports.getName = function(cb) {
+  var that = this;
+  userPlugin.get.call(that, "currentColor", function(err, currentColor) {
+    if (currentColor) {
+      var newColor = Color(currentColor);
+      var name = classifier.classify(newColor.hexString());
+      cb(null, "I would call it " + name);
+    } else {
+      cb(null, "I'm not sure.");
+    }
+
+  });
+};
 
 exports.changeTint = function(cb) {
   var that = this;
@@ -86,18 +116,24 @@ exports.colorLookup = function(cb) {
       } else {
         facts.get({ subject: fthing, predicate:'color'}, function(err, list) {
           if (!_.isEmpty(list)) {
-            that.message.props['color'] = list[0].object;
-            cb(null, "Let me show you.");
+            var colorHex = toHex(list[0].object);
+            that.message.props['color'] = colorHex;
+            userPlugin.save.call(that, "currentColor", colorHex, function(){
+              cb(null, "Let me show you.");
+            });
           } else {
 
             that.cnet.resolveFact("color", thing, function(err, res){
-              that.message.props['color'] = res;
               if (res) {
-                suggest = "Let me show you.";
+                var colorHex = toHex(res);
+                that.message.props['color'] = colorHex;
+                userPlugin.save.call(that, "currentColor", colorHex, function(){
+                  cb(null, "Let me show you.");
+                });
               } else {
-                suggest = "";
+                cb(null, "");
               }
-              cb(null, suggest);
+              
             });
           }
         });
