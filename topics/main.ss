@@ -5,7 +5,7 @@
 ? * [called|call] *
 - {keep} ^getName()
 
-? what color is (a|my) *
+? what color is (a|my|the) *
 - ^colorLookup()
 
 + *1
@@ -28,3 +28,9 @@
 
 + hide picker
 - {keep} ^addMessageProp(picker,hide) Hiding Picker
+
+// + ~emohello [*~2]
+// - Hi!
+// - Hello.
+// - Howdy.
+

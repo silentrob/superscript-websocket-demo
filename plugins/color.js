@@ -64,8 +64,10 @@ exports.getRanomColor = function(cb) {
   var newColor = Color().rgb(r,g,b);
   that.message.props['color'] = newColor.hexString();
 
+  var name = classifier.classify(newColor.hexString());
+
   userPlugin.save.call(that, "currentColor", newColor.hexString(), function() {
-    cb(null, "How about this?");
+    cb(null, "How about this? I call it " + name);
   });
 };
 
